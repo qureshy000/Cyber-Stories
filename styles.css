@@ -17,6 +17,9 @@ body {
 h1, h2, h3 {
     color: #000; /* Set headings color to black */
     text-align: center; /* Center the headings */
+    font-family: 'Arial', sans-serif; /* Change font to Arial */
+    font-weight: bold; /* Make headings bold */
+
 }
 
 .highlight {
@@ -25,6 +28,9 @@ h1, h2, h3 {
 
 header {
     text-align: center; /* Center the title */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+
     border-bottom: 2px solid #000;
     margin-bottom: 20px;
     width: 100%; /* Ensure full width */
@@ -32,7 +38,10 @@ header {
 
 h1 {
     font-size: 3em; /* Increased font size for the title */
-    font-weight: bold; /* Make the heading bold */
+    font-weight: 900; /* Make the heading bolder */
+    margin: 0; /* Remove default margin */
+
+
 
     margin-bottom: 10px;
     margin-left: auto; /* Centering adjustments */
