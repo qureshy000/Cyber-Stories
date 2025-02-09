@@ -14,7 +14,7 @@ body {
     padding: 20px;
 }
 
-t1,t2,t3 {
+title {
     color: #000; /* Set headings color to black */
     text-align: center; /* Center the headings */
     font-family: 'Arial', sans-serif; /* Change font to Arial */
