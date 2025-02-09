@@ -32,6 +32,8 @@ header {
 
 h1 {
     font-size: 3em; /* Increased font size for the title */
+    font-weight: bold; /* Make the heading bold */
+
     margin-bottom: 10px;
     margin-left: auto; /* Centering adjustments */
     margin-right: auto; /* Centering adjustments */
