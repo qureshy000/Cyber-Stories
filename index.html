@@ -16,8 +16,12 @@
       align-items: center;
       min-height: 100vh;
       text-align: center;
+      overflow: hidden;
+      position: relative;
     }
     .container {
+      position: relative;
+      z-index: 1;
       max-width: 600px;
       padding: 20px;
       background: rgba(0, 0, 0, 0.7);
@@ -82,6 +86,14 @@
       color: #ccc;
       margin-top: 10px;
     }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -118,6 +130,9 @@
       <small>Made with love, just for you, Anzi.</small>
     </p>
   </div>
+
+  <!-- Background Animation -->
+  <canvas id="canvas"></canvas>
 
   <script>
     // Reasons and Affirmations
@@ -159,6 +174,74 @@
       document.getElementById('affirmation').textContent = `"${randomAffirmation}"`;
       document.getElementById('affirmation').style.display = 'block';
     }
+
+    // Background Animation (Optimized for Mobile)
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particlesArray = [];
+
+    class Particle {
+      constructor(x, y, directionX, directionY, size, color) {
+        this.x = x;
+        this.y = y;
+        this.directionX = directionX;
+        this.directionY = directionY;
+        this.size = size;
+        this.color = color;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+      update() {
+        if (this.x + this.size > canvas.width || this.x - this.size < 0) {
+          this.directionX = -this.directionX;
+        }
+        if (this.y + this.size > canvas.height || this.y - this.size < 0) {
+          this.directionY = -this.directionY;
+        }
+        this.x += this.directionX;
+        this.y += this.directionY;
+        this.draw();
+      }
+    }
+
+    function init() {
+      particlesArray = [];
+      // Reduce the number of particles for mobile devices
+      let numberOfParticles = (canvas.height * canvas.width) / (window.innerWidth < 768 ? 18000 : 9000);
+      for (let i = 0; i < numberOfParticles; i++) {
+        let size = Math.random() * 2 + 1; // Smaller particles for better performance
+        let x = Math.random() * (canvas.width - size * 2) + size;
+        let y = Math.random() * (canvas.height - size * 2) + size;
+        let directionX = Math.random() * 0.2 - 0.1; // Slower movement
+        let directionY = Math.random() * 0.2 - 0.1;
+        let color = '#ff6f61';
+        particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      init();
+    });
+
+    init();
+    animate();
   </script>
 </body>
 </html>
