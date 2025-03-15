@@ -9,15 +9,14 @@
       font-family: 'Poppins', sans-serif;
       margin: 0;
       padding: 0;
+      overflow: hidden;
       background: #1a1a1a;
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
       text-align: center;
-      overflow: hidden;
-      position: relative;
     }
     .container {
       position: relative;
@@ -30,12 +29,12 @@
       backdrop-filter: blur(10px);
     }
     h1 {
-      font-size: 2rem;
+      font-size: 2.5rem;
       margin-bottom: 20px;
       color: #ff6f61;
     }
     p {
-      font-size: 1rem;
+      font-size: 1.1rem;
       line-height: 1.6;
       margin-bottom: 20px;
     }
@@ -60,7 +59,7 @@
       color: #ff6f61;
     }
     .affirmation {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: bold;
       color: #ff6f61;
       margin-top: 20px;
@@ -80,11 +79,6 @@
     }
     textarea::placeholder {
       color: #ccc;
-    }
-    .work-in-progress {
-      font-size: 0.9rem;
-      color: #ccc;
-      margin-top: 10px;
     }
     canvas {
       position: absolute;
@@ -121,10 +115,7 @@
     <p>
       Write something here—your thoughts, feelings, or a message for me. This space is just for you:
     </p>
-    <textarea id="journal" placeholder="Write your heart out..."></textarea>
-    <p class="work-in-progress">
-      🚧 The functionality of this space is still a work in progress. It will be updated soon! 🚧
-    </p>
+    <textarea placeholder="Write your heart out..."></textarea>
 
     <p>
       <small>Made with love, just for you, Anzi.</small>
@@ -175,7 +166,7 @@
       document.getElementById('affirmation').style.display = 'block';
     }
 
-    // Background Animation (Optimized for Mobile)
+    // Background Animation
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -213,14 +204,13 @@
 
     function init() {
       particlesArray = [];
-      // Reduce the number of particles for mobile devices
-      let numberOfParticles = (canvas.height * canvas.width) / (window.innerWidth < 768 ? 18000 : 9000);
+      let numberOfParticles = (canvas.height * canvas.width) / 9000;
       for (let i = 0; i < numberOfParticles; i++) {
-        let size = Math.random() * 2 + 1; // Smaller particles for better performance
+        let size = Math.random() * 3 + 1;
         let x = Math.random() * (canvas.width - size * 2) + size;
         let y = Math.random() * (canvas.height - size * 2) + size;
-        let directionX = Math.random() * 0.2 - 0.1; // Slower movement
-        let directionY = Math.random() * 0.2 - 0.1;
+        let directionX = Math.random() * 0.4 - 0.2;
+        let directionY = Math.random() * 0.4 - 0.2;
         let color = '#ff6f61';
         particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
       }
