@@ -1,61 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <style> 
-    .page-title {
-           text-align: center;
-           font-weight: bold;
-           font-family: 'Lora', serif;
-           font-style: italic;
-           font-size: 4em; /* Adjust the size as needed */}
-        .page-image {
-            max-height: 100px; /* Adjust the height as needed */
-            margin-right: 20px;}
-           </style>
-
-    <title>Cyber Stories - Home</title>
-     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-        
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For Anzija 💖</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #1a1a1a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #ff6f61;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #ff6f61;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin: 5px;
+    }
+    button:hover {
+      background: #ff3b2f;
+    }
+    .hidden {
+      display: none;
+      margin-top: 20px;
+      font-style: italic;
+      color: #ff6f61;
+    }
+    .affirmation {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #ff6f61;
+      margin-top: 20px;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-    <h1 class="page-title">Cyber Stories</h1>
-    <img src="Computer hacker with laptop icon, Spy agent isolated on white_.jpg" alt="Doodle Decoration" class="page-image">
+  <div class="container">
+    <h1>For Anzija 💖</h1>
+    <p>
+      Welcome to your special corner of the internet. This is just for you—a place to feel loved, inspired, and uplifted.
+    </p>
+    <button onclick="showReason()">Click for a Reason Why You're Amazing</button>
+    <p id="reason" class="hidden"></p>
 
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <ul class="navbar-nav">
-                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="news.html">News</a></li>
-                <li class="nav-item"><a class="nav-link" href="education.html">Education</a></li>
-                <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
-            
-            </ul>
-        </nav>
+    <hr>
 
-    </header>
-    <main class="container">
+    <p>
+      Feeling lonely or need a little boost? Click below for a daily affirmation:
+    </p>
+    <button onclick="showAffirmation()">Get Your Daily Affirmation</button>
+    <p id="affirmation" class="affirmation hidden"></p>
 
-        <h2>K-MAT 2025</h2>
-        <article>
-            <h3><a href="education.html">K-MAT 2025</a></h3>
-            <p>Click the link to navigate to the education page.</p>
+    <p>
+      <small>Made with love, just for you, Anzija.</small>
+    </p>
+  </div>
 
-        </article>
-        <article>
-            <h3>Headline Article 2</h3>
-            <p>This is a summary of the second headline article. It provides a brief overview of the content.</p>
-        </article>
-        <article>
-            <h3>Headline Article 3</h3>
-            <p>This is a summary of the third headline article. It provides a brief overview of the content.</p>
-        </article>
-    </main>
-    <footer>
-        <p>&copy; 2023 Cyber Stories. All rights reserved.</p>
-    </footer>
+  <!-- Background Animation -->
+  <canvas id="canvas"></canvas>
+
+  <script>
+    // Reasons and Affirmations
+    const reasons = [
+      "I love the way you make me feel at home, no matter where we are.",
+      "I love how your smile lights up even the darkest days.",
+      "I love your kindness—it inspires me to be a better person.",
+      "I love the way you laugh at my silly jokes.",
+      "I love how you make even the ordinary moments feel special.",
+      "I love your strength and the way you face challenges with grace.",
+      "I love how you always know how to make me feel loved.",
+      "I love the way you see the world—it’s beautiful, just like you.",
+      "I love how you make me believe in us, every single day.",
+      "I love you for being you—perfectly, uniquely, wonderfully you."
+    ];
+
+    const affirmations = [
+      "You are enough, just as you are.",
+      "You are capable of amazing things.",
+      "Your strength inspires everyone around you.",
+      "You bring light and joy to the world.",
+      "You are deserving of love and happiness.",
+      "You have the power to create your own happiness.",
+      "You are brave, even on the days you don’t feel like it.",
+      "You are making a difference, even if you don’t see it yet.",
+      "You are loved more than you know.",
+      "You are a beautiful soul, inside and out."
+    ];
+
+    function showReason() {
+      const randomReason = reasons[Math.floor(Math.random() * reasons.length)];
+      document.getElementById('reason').textContent = randomReason;
+      document.getElementById('reason').style.display = 'block';
+    }
+
+    function showAffirmation() {
+      const randomAffirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
+      document.getElementById('affirmation').textContent = `"${randomAffirmation}"`;
+      document.getElementById('affirmation').style.display = 'block';
+    }
+
+    // Background Animation
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let particlesArray = [];
+
+    class Particle {
+      constructor(x, y, directionX, directionY, size, color) {
+        this.x = x;
+        this.y = y;
+        this.directionX = directionX;
+        this.directionY = directionY;
+        this.size = size;
+        this.color = color;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+      update() {
+        if (this.x + this.size > canvas.width || this.x - this.size < 0) {
+          this.directionX = -this.directionX;
+        }
+        if (this.y + this.size > canvas.height || this.y - this.size < 0) {
+          this.directionY = -this.directionY;
+        }
+        this.x += this.directionX;
+        this.y += this.directionY;
+        this.draw();
+      }
+    }
+
+    function init() {
+      particlesArray = [];
+      let numberOfParticles = (canvas.height * canvas.width) / 9000;
+      for (let i = 0; i < numberOfParticles; i++) {
+        let size = Math.random() * 3 + 1;
+        let x = Math.random() * (canvas.width - size * 2) + size;
+        let y = Math.random() * (canvas.height - size * 2) + size;
+        let directionX = Math.random() * 0.4 - 0.2;
+        let directionY = Math.random() * 0.4 - 0.2;
+        let color = '#ff6f61';
+        particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      init();
+    });
+
+    init();
+    animate();
+  </script>
 </body>
 </html>
