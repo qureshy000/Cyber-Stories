@@ -64,6 +64,27 @@
       color: #ff6f61;
       margin-top: 20px;
     }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ff6f61;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      resize: none;
+    }
+    textarea::placeholder {
+      color: #ccc;
+    }
+    .work-in-progress {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 10px;
+    }
     canvas {
       position: absolute;
       top: 0;
@@ -93,6 +114,16 @@
     </p>
     <button onclick="showAffirmation()">Get Your Daily Affirmation</button>
     <p id="affirmation" class="affirmation hidden"></p>
+
+    <hr>
+
+    <p>
+      Write something here—your thoughts, feelings, or a message for me. This space is just for you:
+    </p>
+    <textarea id="journal" placeholder="Write your heart out..."></textarea>
+    <p class="work-in-progress">
+      🚧 The functionality of this space is still a work in progress. It will be updated soon! 🚧
+    </p>
 
     <p>
       <small>Made with love, just for you, Anzi.</small>
@@ -143,7 +174,7 @@
       document.getElementById('affirmation').style.display = 'block';
     }
 
-    // Background Animation
+    // Background Animation (Optimized for Mobile)
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -181,7 +212,8 @@
 
     function init() {
       particlesArray = [];
-      let numberOfParticles = (canvas.height * canvas.width) / 9000;
+      // Reduce the number of particles for mobile devices
+      let numberOfParticles = (canvas.height * canvas.width) / (window.innerWidth < 768 ? 18000 : 9000);
       for (let i = 0; i < numberOfParticles; i++) {
         let size = Math.random() * 3 + 1;
         let x = Math.random() * (canvas.width - size * 2) + size;
