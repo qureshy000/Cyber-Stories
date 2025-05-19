@@ -1,1 +1,434 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hacker Dino Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            user-select: none;
+        }
+        canvas {
+            display: block;
+        }
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            display: none;
+            text-align: center;
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+        }
+        #highScore {
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            font-size: 18px;
+            color: #0a0;
+        }
+        #startScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        #startButton {
+            background: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #startButton:hover {
+            background: #0f0;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="game"></canvas>
+    <div id="gameOver">SYSTEM FAILURE<br><span style="font-size: 24px">Score: <span id="finalScore">0</span></span><br><span style="font-size: 18px">Press SPACE to reboot</span></div>
+    <div id="score">0</div>
+    <div id="highScore">High: 0</div>
+    <div id="startScreen">
+        <h1>HACKER DINO</h1>
+        <p>Press SPACE or UP to jump</p>
+        <button id="startButton">INITIATE SYSTEM</button>
+        <p1>Created by Althaf</p1>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const gameOverDisplay = document.getElementById('gameOver');
+        const scoreDisplay = document.getElementById('score');
+        const highScoreDisplay = document.getElementById('highScore');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const startScreen = document.getElementById('startScreen');
+        const startButton = document.getElementById('startButton');
+
+        // Set canvas size
+        canvas.width = 800;
+        canvas.height = 300;
+
+        // Game variables
+        let gameSpeed = 5;
+        let score = 0;
+        let highScore = 0;
+        let gameStarted = false;
+        let gameOver = false;
+        let animationId;
+        let lastObstacleTime = 0;
+        let obstacleInterval = 2000; // Milliseconds between obstacles
+
+        // Dino sprite
+        const dino = {
+            x: 50,
+            y: 220,
+            width: 60,
+            height: 60,
+            velocityY: 0,
+            gravity: 0.8,
+            jumpForce: -15,
+            isJumping: false,
+            frames: 0,
+            
+            update: function() {
+                // Apply gravity
+                this.velocityY += this.gravity;
+                this.y += this.velocityY;
+                
+                // Ground collision
+                if (this.y > 220) {
+                    this.y = 220;
+                    this.velocityY = 0;
+                    this.isJumping = false;
+                }
+                
+                this.frames++;
+            },
+            
+            draw: function() {
+                // Draw hacker-style dino
+                ctx.fillStyle = '#0f0';
+                
+                // Body
+                ctx.fillRect(this.x + 10, this.y + 10, 40, 40);
+                
+                // Head
+                ctx.fillRect(this.x + 40, this.y, 20, 20);
+                
+                // Eyes (blinking animation)
+                if (Math.floor(this.frames / 10) % 10 < 7) {
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(this.x + 45, this.y + 5, 5, 5);
+                    ctx.fillRect(this.x + 55, this.y + 5, 5, 5);
+                }
+                
+                // Legs
+                const legFrame = Math.floor(this.frames / 5) % 2;
+                ctx.fillStyle = '#0f0';
+                if (legFrame === 0) {
+                    ctx.fillRect(this.x + 15, this.y + 50, 10, 10);
+                    ctx.fillRect(this.x + 35, this.y + 50, 10, 10);
+                } else {
+                    ctx.fillRect(this.x + 10, this.y + 50, 10, 10);
+                    ctx.fillRect(this.x + 40, this.y + 50, 10, 10);
+                }
+                
+                // Tail
+                ctx.fillRect(this.x, this.y + 20, 10, 5);
+            },
+            
+            jump: function() {
+                if (!this.isJumping) {
+                    this.velocityY = this.jumpForce;
+                    this.isJumping = true;
+                }
+            }
+        };
+
+        // Obstacles
+        let obstacles = [];
+        
+        class Obstacle {
+            constructor() {
+                this.type = Math.random() > 0.5 ? 'cactus' : 'binary';
+                
+                if (this.type === 'cactus') {
+                    this.width = 20 + Math.random() * 10;
+                    this.height = 30 + Math.random() * 30;
+                } else {
+                    this.width = 30;
+                    this.height = 40;
+                }
+                
+                this.x = canvas.width;
+                this.y = 240 - this.height;
+                this.passed = false;
+            }
+            
+            update() {
+                this.x -= gameSpeed;
+            }
+            
+            draw() {
+                ctx.fillStyle = '#0f0';
+                
+                if (this.type === 'cactus') {
+                    // Draw cactus-like obstacle
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    
+                    // Add some segments to make it look like cactus
+                    ctx.fillStyle = '#000';
+                    for (let i = 5; i < this.height; i += 10) {
+                        ctx.fillRect(this.x, this.y + i, this.width, 3);
+                    }
+                } else {
+                    // Draw binary code obstacle
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                    
+                    // Add binary pattern
+                    ctx.fillStyle = '#000';
+                    ctx.font = '10px Courier New';
+                    for (let i = 5; i < this.height; i += 12) {
+                        const binary = Math.random() > 0.5 ? '1010' : '1100';
+                        ctx.fillText(binary, this.x + 5, this.y + i);
+                    }
+                }
+            }
+        }
+
+        // Ground
+        const ground = {
+            height: 20,
+            draw: function() {
+                ctx.fillStyle = '#0f0';
+                ctx.fillRect(0, 240, canvas.width, this.height);
+                
+                // Draw ground as a binary stream
+                ctx.fillStyle = '#000';
+                ctx.font = '12px Courier New';
+                for (let i = 0; i < canvas.width; i += 40) {
+                    const rand = Math.floor(Math.random() * 3);
+                    ctx.fillText(rand === 0 ? '1010' : rand === 1 ? '1100' : '1001', i, 255);
+                }
+            }
+        };
+
+        // Cloud
+        class Cloud {
+            constructor() {
+                this.x = canvas.width;
+                this.y = 50 + Math.random() * 100;
+                this.width = 40 + Math.random() * 40;
+                this.speed = 1 + Math.random() * 2;
+            }
+            
+            update() {
+                this.x -= this.speed;
+            }
+            
+            draw() {
+                // Draw cloud as a cluster of green dots
+                ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+                for (let i = 0; i < 5; i++) {
+                    const offsetX = Math.sin(i) * 10;
+                    const offsetY = Math.cos(i) * 5;
+                    ctx.beginPath();
+                    ctx.arc(this.x + offsetX, this.y + offsetY, 3 + Math.random() * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        let clouds = [];
+
+        // Game functions
+        function spawnObstacle() {
+            const now = Date.now();
+            if (now - lastObstacleTime > obstacleInterval && obstacles.length < 2) {
+                obstacles.push(new Obstacle());
+                lastObstacleTime = now;
+                
+                // Randomize next obstacle time (1500-2500ms)
+                obstacleInterval = 1500 + Math.random() * 1000;
+            }
+        }
+
+        function spawnCloud() {
+            if (Math.random() < 0.005) {
+                clouds.push(new Cloud());
+            }
+        }
+
+        function checkCollision() {
+            for (let obstacle of obstacles) {
+                if (
+                    dino.x + 10 < obstacle.x + obstacle.width &&
+                    dino.x + dino.width - 10 > obstacle.x &&
+                    dino.y < obstacle.y + obstacle.height &&
+                    dino.y + dino.height > obstacle.y
+                ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function updateScore() {
+            score++;
+            scoreDisplay.textContent = score;
+            
+            // Increase game speed slightly over time (capped at 12)
+            if (score % 500 === 0 && gameSpeed < 12) {
+                gameSpeed += 0.5;
+            }
+            
+            // Check if obstacle passed
+            for (let obstacle of obstacles) {
+                if (!obstacle.passed && obstacle.x + obstacle.width < dino.x) {
+                    obstacle.passed = true;
+                    score += 20;
+                }
+            }
+        }
+
+        function resetGame() {
+            obstacles = [];
+            clouds = [];
+            dino.y = 220;
+            dino.velocityY = 0;
+            dino.isJumping = false;
+            score = 0;
+            gameSpeed = 5;
+            gameOver = false;
+            lastObstacleTime = 0;
+            obstacleInterval = 2000;
+            gameOverDisplay.style.display = 'none';
+            scoreDisplay.textContent = '0';
+        }
+
+        function gameLoop() {
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw matrix-like background
+            drawMatrixBackground();
+            
+            // Update and draw clouds
+            spawnCloud();
+            clouds.forEach((cloud, index) => {
+                cloud.update();
+                cloud.draw();
+                
+                // Remove clouds that are off screen
+                if (cloud.x + cloud.width < 0) {
+                    clouds.splice(index, 1);
+                }
+            });
+            
+            // Update and draw ground
+            ground.draw();
+            
+            // Update and draw dino
+            dino.update();
+            dino.draw();
+            
+            // Spawn, update and draw obstacles
+            spawnObstacle();
+            obstacles.forEach((obstacle, index) => {
+                obstacle.update();
+                obstacle.draw();
+                
+                // Remove obstacles that are off screen
+                if (obstacle.x + obstacle.width < 0) {
+                    obstacles.splice(index, 1);
+                }
+            });
+            
+            // Update score
+            updateScore();
+            
+            // Check for collisions
+            if (checkCollision()) {
+                gameOver = true;
+                finalScoreDisplay.textContent = score;
+                highScore = Math.max(highScore, score);
+                highScoreDisplay.textContent = `High: ${highScore}`;
+                gameOverDisplay.style.display = 'block';
+                return;
+            }
+            
+            if (!gameOver) {
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function drawMatrixBackground() {
+            // Draw random falling characters in the background
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.05)';
+            ctx.font = '14px Courier New';
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const char = Math.random() > 0.5 ? String.fromCharCode(0x30A0 + Math.random() * 96) : Math.floor(Math.random() * 10);
+                ctx.fillText(char, x, y);
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('keydown', (e) => {
+            if ((e.code === 'Space' || e.key === 'ArrowUp') && !gameOver && gameStarted) {
+                dino.jump();
+                e.preventDefault();
+            }
+            
+            if ((e.code === 'Space' || e.key === 'ArrowUp') && gameOver) {
+                resetGame();
+                gameLoop();
+            }
+        });
+
+        startButton.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            gameStarted = true;
+            gameLoop();
+        });
+
+        // Touch support for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            if (!gameOver && gameStarted) {
+                dino.jump();
+                e.preventDefault();
+            }
+            
+            if (gameOver) {
+                resetGame();
+                gameLoop();
+            }
+        });
+
+        // Initial draw
+        ctx.font = '16px Courier New';
+        ctx.textAlign = 'left';
+    </script>
+</body>
+</html>
 
